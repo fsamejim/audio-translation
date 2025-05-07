@@ -55,6 +55,17 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -r requirements.txt
 
+=== new Mac
+brew install pyenv
+✗ which pyenv
+/opt/homebrew/bin/pyenv
+Code VS setup
+echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
+echo 'eval "$(pyenv init -)"' >> ~/.zshrc
+exec "$SHELL"
+
+
+% git commit -m "[sammy]Add message"
 
 Note:
 

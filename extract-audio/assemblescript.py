@@ -1,14 +1,19 @@
 import assemblyai as aai
 from dotenv import load_dotenv
 import os
+from pathlib import Path
 
-load_dotenv() 
+# Load .env from same directory as the script
+env_path = Path(__file__).resolve().parent / ".env"
+load_dotenv(dotenv_path=env_path)
 
 # Set your API key
-aai.settings.api_key = os.getenv(assemblyai_KEY)
+aai.settings.api_key = os.getenv("assemblyai_KEY")
+
+print("Loaded API key:", aai.settings.api_key)  # Debug print
 
 # Local file path
-audio_file = os.getenv(AUDIO_FILE)
+audio_file = os.getenv("AUDIO_FILE")
 
 # Enable speaker diarization
 config = aai.TranscriptionConfig(

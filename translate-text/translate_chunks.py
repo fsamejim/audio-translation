@@ -1,17 +1,6 @@
 import os
 from dotenv import load_dotenv
-# from pathlib import Path
 from openai import OpenAI
-
-# env_path = Path(__file__).parent / ".env"
-#print(f"🧪 Checking for .env at: {env_path}")
-
-# Try to load explicitly
-##load_dotenv(dotenv_path=env_path)
-
-# Check result
-#api_key = os.getenv("OPENAI_API_KEY")
-
 import re
 import textwrap
 import time
@@ -71,7 +60,7 @@ for idx, chunk in enumerate(chunks, start=1):
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             response = client.chat.completions.create(
-                model=os.getenv("MODEL_NAME") ### like "gpt-4",
+                model=os.getenv("MODEL_NAME"), ### like "gpt-4"
                 messages=messages
             )
             content = response.choices[0].message.content.strip()
