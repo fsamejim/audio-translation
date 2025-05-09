@@ -44,6 +44,7 @@ for idx, chunk in enumerate(chunks, start=1):
         	"content": (
                 "You are a professional translator. Translate the following English dialogue into natural, sincere spoken Japanese, as if it were a respectful and heartfelt conversation between two older men. "
                 "The tone should feel like a mature discussion between two lifelong friends or seasoned individuals — warm, humble, and spoken, yet carrying dignity and emotional depth. "
+                "use 僕 instead of 俺 for I phrase"
                 "Avoid stiff or formal language. Use natural phrasing that fits a spoken tone, suitable for an audiobook, podcast, or sincere AA talk. "
                 "Do not change or translate the speaker labels — keep 'Speaker A:' and 'Speaker B:' exactly as they are. "
                 "Do not use labels like '話者', 'スピーカー', or 'Speaker 1/2'. "
@@ -67,25 +68,28 @@ for idx, chunk in enumerate(chunks, start=1):
             if not content:
                 raise ValueError("Empty response.")
 
-            # Normalize speaker tags (failsafe)
-            content = re.sub(r"(話者\s*A|スピーカー\s*A|Speaker\s*1|SpeakerＡ)", "Speaker A:", content)
-            content = re.sub(r"(話者\s*B|スピーカー\s*B|Speaker\s*2|SpeakerＢ)", "Speaker B:", content)
+            # Normalize speaker tags
+            for i, speaker in enumerate(["A", "B", "C", "D", "E"], start=1):
+                pattern = fr"(話者\s*{speaker}|スピーカー\s*{speaker}|Speaker\s*{i}|Speaker{speaker})"
+                content = re.sub(pattern, f"Speaker {speaker}:", content)
 
             # Insert 2 line breaks between speaker changes
             lines = content.splitlines()
             output_lines = []
             last_speaker = None
+            speaker_pattern = "|".join([f"Speaker {s}" for s in ["A", "B", "C", "D", "E"]])
+
             for line in lines:
-                match = re.match(r"^(Speaker [AB]):", line.strip())
+                match = re.match(fr"^({speaker_pattern}):", line.strip())
                 if match:
                     speaker = match.group(1)
                     if last_speaker and speaker != last_speaker:
-                        output_lines.append("")  # first line break
-                        output_lines.append("")  # second line break
+                        output_lines.append("")  # First line break
+                        output_lines.append("")  # Second line break
                     last_speaker = speaker
                 output_lines.append(line)
 
-            content = "\n".join(output_lines)
+            content = "\n".join(output_lines)       
 
             with open(out_file, "w", encoding="utf-8") as f:
                 f.write(content)

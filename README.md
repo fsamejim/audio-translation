@@ -64,10 +64,46 @@ echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
 exec "$SHELL"
 
-
 % git commit -m "[sammy]Add message"
 
-Note:
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+# Process Workflow
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+#
+# Step1: Extract text script from audio
+#
+extract-audio/assemblescript.py
+Use assembllyai api to extract native text from the audio.
+assembllyai supports diarization
+
+extract-audio/massage_text.py
+Make human readable format with speaker tags at the beginning
+#
+# Step2: Translate the native text script into Japanese
+#
+translate-text/translate_chunks.py
+Use OpenAI api to translate the native language into Japanese.
+This script creates chunks text in the chunks folder.(error handling/retry)
+
+translate-text/merge_chunks.py
+Consodidate all chunks texts into one script
+#
+# Step3: Generate the mp3 audio file with Japanese
+# Use Google api for the audio creation 
+generate-audio/multi_speaker_tts.py 
+Accomodate with safe limits, retry, error handling
+When the process hand, re-use the existing result audio produced in the output folder
+This, jsut re-run again.
+#
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
+
+#
+# Note:
+#
+git add README.md generate-audio/multi_speaker_tts.py translate-text/merge_chunks.py translate-text/translate_chunks.py
+git commit -m "[sammy] Update README and scripts for audio translation and merging"
 
 Using VS Code as a code editor on Mac (Mac terminal environment is different from VS terminal)
 Shell Command: Install 'code' command in PATH (This will install the code CLI tool and allow you to run: code .)
