@@ -11,7 +11,7 @@ import re                              # For filtering files with patterns
 MAX_TTS_LENGTH = 4000                          # Character limit per TTS call (Google's max is ~5000 bytes)
 MAX_RETRIES = 3                                # Max retries for failed TTS calls
 SERVICE_ACCOUNT_PATH = "google_json/sammy.json"  # Your Google Cloud credential JSON
-INPUT_FILE = "../translate-text/transcript_ja_02.txt" # Input dialogue text file
+INPUT_FILE = "../translate-text/transcript_ja_02_done.txt" # Input dialogue text file
 OUTPUT_DIR = "output"                          # Where each MP3 chunk is saved
 MERGED_FILE = "full_conversation.mp3"          # Final merged MP3 output
 PAUSE_MS = 1000                                # Silence (ms) between merged chunks
@@ -68,7 +68,28 @@ def generate_audio_chunks(dialogue):
 
         # Sanitize the text and split into smaller chunks if too long
         sanitized = sanitize_input(text)
-        chunks = textwrap.wrap(sanitized, width=MAX_TTS_LENGTH, break_long_words=False)
+        def split_text_by_bytes(text, byte_limit=4800):
+            chunks = []
+            current_chunk = ""
+            for sentence in re.split(r'(?<=[。！？\n])', text):
+                sentence = sentence.strip()
+                if not sentence:
+                    continue
+
+                test_chunk = current_chunk + sentence
+                if len(test_chunk.encode("utf-8")) > byte_limit:
+                    if current_chunk:
+                        chunks.append(current_chunk.strip())
+                    current_chunk = sentence
+                else:
+                    current_chunk = test_chunk
+
+            if current_chunk:
+                chunks.append(current_chunk.strip())
+
+            return chunks
+
+        chunks = split_text_by_bytes(text)
 
         # Process each chunk individually (most often there is only one)
         for j, chunk in enumerate(chunks):
