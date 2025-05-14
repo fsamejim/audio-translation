@@ -2,7 +2,7 @@ import os
 import re
 
 CHUNK_DIR = "chunks"
-OUTPUT_FILE = "transcript_ja_02.txt"
+OUTPUT_FILE = "transcript_ja_04.txt"
 
 chunk_files = sorted(f for f in os.listdir(CHUNK_DIR) if f.startswith("chunk_") and f.endswith(".txt"))
 

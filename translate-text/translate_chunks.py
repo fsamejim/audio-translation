@@ -42,9 +42,11 @@ for idx, chunk in enumerate(chunks, start=1):
      	{
         	"role": "system",
         	"content": (
+                "This is well known Joe and Charlies's AA workshop conversation."
                 "You are a professional translator. Translate the following English dialogue into natural, sincere spoken Japanese, as if it were a respectful and heartfelt conversation between two older men. "
                 "The tone should feel like a mature discussion between two lifelong friends or seasoned individuals — warm, humble, and spoken, yet carrying dignity and emotional depth. "
                 "use 僕 instead of 俺 for I phrase"
+                "translate sobriety as ソーバー。 Do not translate to 清酒"
                 "Avoid stiff or formal language. Use natural phrasing that fits a spoken tone, suitable for an audiobook, podcast, or sincere AA talk. "
                 "Do not change or translate the speaker labels — keep 'Speaker A:' and 'Speaker B:' exactly as they are. "
                 "Do not use labels like '話者', 'スピーカー', or 'Speaker 1/2'. "
