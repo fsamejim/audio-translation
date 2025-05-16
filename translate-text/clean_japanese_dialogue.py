@@ -2,8 +2,8 @@ import re
 import os
 
 # Input and output file paths
-input_path = "transcript_ja_02.txt"  
-output_path = "transcript_ja_02_done.txt"
+input_path = "transcript_ja_04.txt"  
+output_path = "transcript_ja_04_done.txt"
 
 def clean_japanese_dialogue(input_path, output_path):
     if not os.path.exists(input_path):

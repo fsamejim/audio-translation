@@ -30,6 +30,6 @@ if transcript.status == "error":
     raise RuntimeError(f"Transcription failed: {transcript.error}")
 
 # Save transcript to file
-with open("transcript_en_01.txt", "w", encoding="utf-8") as f:
+with open("transcript_en_04.txt", "w", encoding="utf-8") as f:
     for utterance in transcript.utterances:
         f.write(f"Speaker {utterance.speaker}: {utterance.text}\n")
