@@ -11,9 +11,9 @@ import re                              # For filtering files with patterns
 MAX_TTS_LENGTH = 4000                          # Character limit per TTS call (Google's max is ~5000 bytes)
 MAX_RETRIES = 3                                # Max retries for failed TTS calls
 SERVICE_ACCOUNT_PATH = "google_json/sammy.json"  # Your Google Cloud credential JSON
-INPUT_FILE = "../translate-text/transcript_ja_02_done.txt" # Input dialogue text file
+INPUT_FILE = "../joe-charlie-aa-js/02-japanese-translation-text/transcript_ja_06.txt" # Input dialogue text file
 OUTPUT_DIR = "output"                          # Where each MP3 chunk is saved
-MERGED_FILE = "full_conversation.mp3"          # Final merged MP3 output
+MERGED_FILE = "full_conversation_06.mp3"          # Final merged MP3 output
 PAUSE_MS = 1000                                # Silence (ms) between merged chunks
 
 # Exit early if not run as a script
@@ -156,10 +156,16 @@ def merge_audio_chunks(output_dir=OUTPUT_DIR, result_path=MERGED_FILE, pause_ms=
     pause = AudioSegment.silent(duration=pause_ms)  # Insert silence between parts
 
     # Only include files that match our naming pattern
+    def extract_sort_key(filename):
+        # Example: output/07_Speaker_A_1.mp3 → 7
+        basename = os.path.basename(filename)
+        match = re.match(r"(\d+)_Speaker_[A-Z]_(\d+)\.mp3", basename)
+        return int(match.group(1)) if match else float('inf')
+
     files = sorted([
         f for f in glob.glob(os.path.join(output_dir, "*.mp3"))
-        if re.search(r"_\d+(_\d+)?\.mp3$", f)
-    ])
+        if re.search(r"\d+_Speaker_[A-Z]_\d+\.mp3$", f)
+    ], key=extract_sort_key)
     print(f"[DEBUG] Found {len(files)} files to merge.")
 
     if not files:

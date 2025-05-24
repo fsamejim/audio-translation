@@ -1,35 +1,49 @@
 import assemblyai as aai
 from dotenv import load_dotenv
-import os
 from pathlib import Path
+import os
+import glob
 
-# Load .env from same directory as the script
+# === CONFIGURATION ===
+CHUNKS_FOLDER = "processed_audio/chunks"
+OUTPUT_FILE = "transcript_en_08_full.txt"
+API_KEY_ENV_VAR = "assemblyai_KEY"
+
+# === SETUP ===
 env_path = Path(__file__).resolve().parent / ".env"
 load_dotenv(dotenv_path=env_path)
 
-# Set your API key
-aai.settings.api_key = os.getenv("assemblyai_KEY")
+aai.settings.api_key = os.getenv(API_KEY_ENV_VAR)
+if not aai.settings.api_key:
+    raise EnvironmentError("Missing AssemblyAI API key in .env")
 
-print("Loaded API key:", aai.settings.api_key)  # Debug print
-
-# Local file path
-audio_file = os.getenv("AUDIO_FILE")
-
-# Enable speaker diarization
+# === CONFIG ===
 config = aai.TranscriptionConfig(
     speech_model=aai.SpeechModel.best,
     speaker_labels=True
 )
 
-# Transcribe
 transcriber = aai.Transcriber(config=config)
-transcript = transcriber.transcribe(audio_file)
 
-# Check for errors
-if transcript.status == "error":
-    raise RuntimeError(f"Transcription failed: {transcript.error}")
+# === TRANSCRIBE EACH CHUNK ===
+chunk_files = sorted(glob.glob(f"{CHUNKS_FOLDER}/chunk_*.wav"))
 
-# Save transcript to file
-with open("transcript_en_01.txt", "w", encoding="utf-8") as f:
-    for utterance in transcript.utterances:
-        f.write(f"Speaker {utterance.speaker}: {utterance.text}\n")
+if not chunk_files:
+    raise FileNotFoundError("No chunk files found in folder")
+
+with open(OUTPUT_FILE, "w", encoding="utf-8") as outfile:
+    for chunk_path in chunk_files:
+        print(f"🎙 Transcribing: {chunk_path}")
+        transcript = transcriber.transcribe(chunk_path)
+
+        if transcript.status == "error":
+            print(f"❌ Transcription failed for {chunk_path}: {transcript.error}")
+            continue
+
+        # Save each speaker-marked line
+        for utterance in transcript.utterances:
+            outfile.write(f"Speaker {utterance.speaker}: {utterance.text}\n")
+
+        outfile.write("\n--- End of chunk ---\n\n")
+
+print(f"✅ Merged transcript saved to: {OUTPUT_FILE}")
