@@ -2,8 +2,8 @@ import re
 import os
 
 # Input and output file paths
-input_path = "transcript_ja_04.txt"  
-output_path = "transcript_ja_04_done.txt"
+input_path = "transcript_ja_08.txt"  
+output_path = "transcript_ja_08_done.txt"
 
 def clean_japanese_dialogue(input_path, output_path):
     if not os.path.exists(input_path):
@@ -16,6 +16,8 @@ def clean_japanese_dialogue(input_path, output_path):
 
     # Normalize line endings
     raw_text = raw_text.replace('\r\n', '\n').replace('\r', '\n')
+    # Remove all chunk header lines like "=== TRANSLATION CHUNK chunk_006.txt ==="
+    raw_text = re.sub(r"^=== TRANSLATION CHUNK chunk_\\d{3}\\.txt ===\\s*", "", raw_text, flags=re.MULTILINE)
 
     # Remove non-printable or problematic characters (safe for TTS)
     raw_text = re.sub(r'[^\x20-\x7E\u3000-\u303F\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FFF。、「」！？\sA-Za-z0-9:：]', '', raw_text)
