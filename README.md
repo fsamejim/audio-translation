@@ -1,3 +1,6 @@
+# GitHub
+https://github.com/fsamejim/audio-translation
+
 # audio-translation
 Audio translation from one language to another
 
@@ -58,14 +61,27 @@ echo 'eval "$(pyenv init --path)"' >> ~/.zprofile
 echo 'eval "$(pyenv init -)"' >> ~/.zshrc
 exec "$SHELL"
 
-% git commit -m "[sammy]Add message"
-
 
 # --- Process Workflow ---
 ## Step1: Extract text script from audio
+extract-audio/preprocess_audio.py
+Convert the existing audio to the better quality and format, and produce in appropriate chunk size.
+This will produce chunks as well as the conbined full cleaned_xx audio file at extract-audio/processed_audio folder
+The full_cleaned_xx.wav will not be used for the further process of the text extraction.
+- CHUNK_DIR = "processed_audio/chunks"
+- INPUT_AUDIO_PATH = "raw_audio/joe-charlie-bbcomesalive2013cdxx.mp3"
+- OUTPUT_AUDIO_PATH = "processed_audio/joe_charlie_cleaned_xx.wav"
+
+
 extract-audio/assemblescript.py
+Take the previously preprocessed audio chunks as input: extract-audio/processed_audio/chunks
+If the output transcript_en_xx exist, then, the content will be completely over written
 Use assembllyai api to extract native text from the audio.
-assembllyai supports diarization
+assembllyai supports diarization.  
+- CHUNKS_FOLDER = "processed_audio/chunks"
+- OUTPUT_FILE = "transcript_en_xx_full.txt"
+- API_KEY_ENV_VAR = "assemblyai_KEY"
+
 
 extract-audio/massage_text.py
 Make human readable format with speaker tags at the beginning
@@ -74,9 +90,17 @@ Make human readable format with speaker tags at the beginning
 translate-text/translate_chunks.py
 Use OpenAI api to translate the native language into Japanese.
 This script creates chunks text in the chunks folder.(error handling/retry)
+- English_Text= "../joe-charlie-aa-js/01-extracted-native-text/transcript_en_xx.txt"
 
 translate-text/merge_chunks.py
 Consodidate all chunks texts into one script
+- CHUNK_DIR = "chunks"
+- OUTPUT_FILE = "transcript_ja_xx.txt"
+
+translate-text/clean_japanese_dialogue.py
+Clean unnecessary characters from the translated Japanese text including === TRANSLATION CHUNK chunk_xxx.txt ===
+- input_path = "transcript_ja_xx.txt"  
+- output_path = "transcript_ja_xx_done.txt"
 
 ## Step3: Generate the mp3 audio file with Japanese
 Use Google api for the audio creation 
@@ -101,8 +125,3 @@ pip install pydub
 brew install ffmpeg 
 
 pip freeze > requirements.txt
-
-
-
-
-
