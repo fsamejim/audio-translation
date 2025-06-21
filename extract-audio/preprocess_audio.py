@@ -3,8 +3,8 @@ import os
 import math
 
 # === CONFIGURATION ===
-INPUT_AUDIO_PATH = "raw_audio/joe-charlie-bbcomesalive2013cd8.mp3"
-OUTPUT_AUDIO_PATH = "processed_audio/joe_charlie_cleaned_08.wav"
+INPUT_AUDIO_PATH = "Geoffrey_Hinton_org.mp3"
+OUTPUT_AUDIO_PATH = "Geoffrey_Hinton_enhanced.wav"
 CHUNK_DIR = "processed_audio/chunks"
 TARGET_SAMPLE_RATE = 16000
 SILENCE_THRESH_DB = -40
@@ -47,8 +47,10 @@ def preprocess_audio(input_path: str, output_path: str, sample_rate: int = 16000
     cleaned_duration_sec = len(cleaned_audio) / 1000
     print(f"⏱ Cleaned duration: {cleaned_duration_sec:.2f} seconds")
 
-    # Export full cleaned file
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    # Export full cleaned file, if the target file not exist, cleate it
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
     cleaned_audio.export(output_path, format="wav")
     print(f"✅ Exported cleaned audio to: {output_path}")
 
