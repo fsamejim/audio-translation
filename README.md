@@ -69,9 +69,9 @@ extract-audio/preprocess_audio.py
 Convert the existing audio to the better quality and format, and produce in appropriate chunk size.
 This will produce chunks as well as the conbined full cleaned_xx audio file at extract-audio/processed_audio folder
 The full_cleaned_xx.wav will not be used for the further process of the text extraction.
-- CHUNK_DIR = "processed_audio/chunks"
-- INPUT_AUDIO_PATH = "raw_audio/joe-charlie-bbcomesalive2013cdxx.mp3"
-- OUTPUT_AUDIO_PATH = "processed_audio/joe_charlie_cleaned_xx.wav"
+- CHUNK_DIR = "{appropriate path}/processed_audio/chunks"
+- INPUT_AUDIO_PATH = "{appropriate path}/raw_audio/audio_en_xx.mp3"
+- OUTPUT_AUDIO_PATH = "{appropriate path}/processed_audio/audio_en_cleaned_xx.wav"
 
 
 extract-audio/assemblescript.py
@@ -79,9 +79,9 @@ Take the previously preprocessed audio chunks as input: extract-audio/processed_
 If the output transcript_en_xx exist, then, the content will be completely over written
 Use assembllyai api to extract native text from the audio.
 assembllyai supports diarization.  
-- CHUNKS_FOLDER = "processed_audio/chunks"
-- OUTPUT_FILE = "transcript_en_xx_full.txt"
-- API_KEY_ENV_VAR = "assemblyai_KEY"
+- CHUNKS_FOLDER = "{appropriate path}/processed_audio/chunks"
+- OUTPUT_FILE = "{appropriate path}/transcript_en_xx_full.txt"
+- API_KEY_ENV_VAR = "{appropriate path}/assemblyai_KEY"
 
 
 extract-audio/massage_text.py
@@ -91,17 +91,17 @@ Make human readable format with speaker tags at the beginning
 translate-text/translate_chunks.py
 Use OpenAI api to translate the native language into Japanese.
 This script creates chunks text in the chunks folder.(error handling/retry)
-- English_Text= "../joe-charlie-aa-js/01-extracted-native-text/transcript_en_xx.txt"
+- English_Text= "{appropriate path}/transcript_en_xx.txt"
 
 translate-text/merge_chunks.py
 Consodidate all chunks texts into one script
-- CHUNK_DIR = "chunks"
-- OUTPUT_FILE = "transcript_ja_xx.txt"
+- CHUNK_DIR = "{appropriate path}/chunks"
+- OUTPUT_FILE = "{appropriate path}/transcript_ja_xx.txt"
 
 translate-text/clean_japanese_dialogue.py
 Clean unnecessary characters from the translated Japanese text including === TRANSLATION CHUNK chunk_xxx.txt ===
-- input_path = "transcript_ja_xx.txt"  
-- output_path = "transcript_ja_xx_done.txt"
+- input_path = "{appropriate path}/transcript_ja_xx.txt"  
+- output_path = "{appropriate path}/transcript_ja_xx_clean.txt"
 
 ## Step3: Generate the mp3 audio file with Japanese
 Use Google api for the audio creation 
@@ -109,6 +109,10 @@ generate-audio/multi_speaker_tts.py
 Accomodate with safe limits, retry, error handling
 When the process hand, re-use the existing result audio produced in the output folder
 This, jsut re-run again.
+- SERVICE_ACCOUNT_PATH = "{appropriate path}/google_json/sammy.json"  # Your Google Cloud credential JSON
+- INPUT_FILE = "{appropriate path}/transcript_ja_xx_clean.txt" # Input dialogue text file
+- OUTPUT_DIR = "{appropriate path}/output"                          # Where each MP3 chunk is saved
+- MERGED_FILE = "{appropriate path}/full_audio_jp_xx.mp3"   # Final audio output in Japanese
 
 # Note:
 
