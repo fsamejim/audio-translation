@@ -9,14 +9,17 @@ Audio Preprocessing Script
 from pydub import AudioSegment, effects, silence
 import os
 import math
+from pathlib import Path
 
 # === CONFIGURATION ===
-# Path to your input MP3 file
-INPUT_AUDIO_PATH = "/Users/sammy.samejima/privatespace/audio-translation/joe-charlie-aa-js/test-data/joe-charlie-first-15-minutes.mp3"
-# Output path for the cleaned WAV version of the audio
-OUTPUT_AUDIO_PATH = "/Users/sammy.samejima/privatespace/audio-translation/joe-charlie-aa-js/test-output/joe-charlie-first-15-minutes.wav"
-# Directory where audio chunks will be saved
-CHUNK_DIR = "preprocess_audio/chunks"
+SCRIPT_DIR = Path(__file__).resolve().parent
+INPUT_AUDIO_PATH = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-data/joe-charlie-first-15-minutes.mp3"
+# Output path for the cleaned WAV version of the audio (this is just final processed audio.wav.  This file will not be used for the further process)
+OUTPUT_FOLDER_PATH = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/preprocess-audio"
+# Directory where audio chunks will be saved (this chunk data will be used for the next text extraction)
+CHUNK_DIR = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/preprocess-audio/chunks"
+# Automatically generate output .wav file path based on input
+OUTPUT_AUDIO_PATH = OUTPUT_FOLDER_PATH / (INPUT_AUDIO_PATH.stem + ".wav")
 
 # Audio preprocessing settings
 TARGET_SAMPLE_RATE = 16000                # For speech recognition systems
@@ -25,7 +28,7 @@ NORMALIZATION_TARGET_DBFS = -20           # Ideal volume level for clean voice a
 MIN_CHUNK_MS = 4 * 60 * 1000              # Minimum chunk size: 4 minutes
 MAX_CHUNK_MS = 6 * 60 * 1000              # Maximum chunk size: 6 minutes
 
-def preprocess_audio(input_path: str, output_path: str, sample_rate: int = 16000):
+def preprocess_audio(input_path: Path, output_path: Path, sample_rate: int = TARGET_SAMPLE_RATE):
     print(f"🔊 Loading audio from: {input_path}")
     
     # Load and downmix audio to mono with target sample rate
@@ -55,8 +58,7 @@ def preprocess_audio(input_path: str, output_path: str, sample_rate: int = 16000
     if not nonsilent_ranges:
         print("⚠️ No silent segments detected — processing full audio without trimming.")
         cleaned_audio = normalized_audio
-    else:
-        # Merge all non-silent regions with padding
+    else:   # Merge all non-silent regions with padding
         cleaned_audio = AudioSegment.silent(duration=0)
         for start_ms, end_ms in nonsilent_ranges:
             start_ms = max(0, start_ms - PADDING_MS)
@@ -77,11 +79,10 @@ def preprocess_audio(input_path: str, output_path: str, sample_rate: int = 16000
         print("🧩 Audio is short — saving as single chunk.")
         os.makedirs(CHUNK_DIR, exist_ok=True)
         cleaned_audio.export(os.path.join(CHUNK_DIR, "chunk_01.wav"), format="wav")
-    else:
-        # Perform smart silence-aware chunking
+    else:   # Perform smart silence-aware chunking  
         smart_chunk_audio(cleaned_audio, CHUNK_DIR, MIN_CHUNK_MS, MAX_CHUNK_MS)
 
-def smart_chunk_audio(audio: AudioSegment, output_dir: str, min_chunk_ms: int, max_chunk_ms: int):
+def smart_chunk_audio(audio: AudioSegment, output_dir: Path, min_chunk_ms: int, max_chunk_ms: int):
     """
     Split audio intelligently on silence, aiming for chunks between min and max duration
     """
@@ -119,5 +120,8 @@ def smart_chunk_audio(audio: AudioSegment, output_dir: str, min_chunk_ms: int, m
 
     print("🎉 All smart chunks saved.")
 
-if __name__ == "__main__":
+def main():
     preprocess_audio(INPUT_AUDIO_PATH, OUTPUT_AUDIO_PATH)
+
+if __name__ == "__main__":
+    main()
