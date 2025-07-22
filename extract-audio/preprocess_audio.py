@@ -13,7 +13,7 @@ from pathlib import Path
 
 # === CONFIGURATION ===
 SCRIPT_DIR = Path(__file__).resolve().parent
-INPUT_AUDIO_PATH = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-data/joe-charlie-first-15-minutes.mp3"
+INPUT_AUDIO_PATH = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-data/joe-charlie-first-5-minutes.mp3"
 # Output path for the cleaned WAV version of the audio (this is just final processed audio.wav.  This file will not be used for the further process)
 OUTPUT_FOLDER_PATH = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/preprocess-audio"
 # Directory where audio chunks will be saved (this chunk data will be used for the next text extraction)

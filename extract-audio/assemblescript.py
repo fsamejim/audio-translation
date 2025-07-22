@@ -10,7 +10,7 @@ import glob
 # === CONFIGURATION ===
 SCRIPT_DIR = Path(__file__).resolve().parent
 PREPROCESS_AUDIO_CHUNKS_FOLDER = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/preprocess-audio/chunks"
-EN_AUDIO_OUTPUT_TEXT_FILE = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/EN-audio-text-output/joe-charlie-first-15-minutes.txt/"
+EN_AUDIO_OUTPUT_TEXT_FILE = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/EN-audio-text-output/joe-charlie-first-5-minutes.txt"
 
 def main():
     # === SETUP ===
