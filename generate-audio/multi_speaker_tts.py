@@ -3,18 +3,31 @@ from pydub import AudioSegment         # For audio merging and silence insertion
 import glob                            # For listing audio files
 import os                              # For file and directory operations
 import sys                             # For exiting early
-import textwrap                        # For splitting long text safely
 import time                            # For delaying between retries or API calls
 import re                              # For filtering files with patterns
+from dotenv import load_dotenv
+from pathlib import Path
+
+
+# === SETUP ===
+# Load .env from parent of current file
+env_path = Path(__file__).resolve().parent.parent / ".env"
+load_dotenv(dotenv_path=env_path)
+
+TTS_SPEAKING_RATE = float(os.getenv("TTS_SPEAKING_RAT", "1.2"))
+TTS_MAX_LENGTH = float(os.getenv("TTS_MAX_LENGTH", "2000"))          # Character limit per TTS call (Google's max is ~5000 bytes)
+TTS_MAX_RETRIES = int(os.getenv("TTS_MAX_RETRIES", "3"))             # Max retries for failed TTS calls
+GOOGLE_APPLICATION_CREDENTIALS = os.getenv("GOOGLE_APPLICATION_CREDENTIALS")  # Your Google Cloud credential JSON
+TTS_REQUESTS_PER_MINUTE = int(os.getenv("TTS_REQUESTS_PER_MINUTE", "120"))
+TTS_DELAY = 60 / TTS_REQUESTS_PER_MINUTE  # seconds between API calls
+TTS_RETRY_BASE_DELAY=float(os.getenv("TTS_RETRY_BASE_DELAY", "2"))  
+PAUSE_MS = 1000                                # Silence (ms) between merged chunks
 
 # === CONFIGURATION ===
-MAX_TTS_LENGTH = 4000                          # Character limit per TTS call (Google's max is ~5000 bytes)
-MAX_RETRIES = 3                                # Max retries for failed TTS calls
-SERVICE_ACCOUNT_PATH = "google_json/sammy.json"  # Your Google Cloud credential JSON
-INPUT_FILE = "../joe-charlie-aa-js/02-japanese-translation-text/transcript_ja_06.txt" # Input dialogue text file
-OUTPUT_DIR = "output"                          # Where each MP3 chunk is saved
-MERGED_FILE = "full_conversation_06.mp3"          # Final merged MP3 output
-PAUSE_MS = 1000                                # Silence (ms) between merged chunks
+SCRIPT_DIR = Path(__file__).resolve().parent
+INPUT_FILE  = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/JP-text-translation/clean-JP-joe-charlie-first-5-minutes.txt" # Input dialogue text file
+OUTPUT_DIR = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/JP-audio-output/chunks" # Where each MP3 chunk is saved
+MERGED_FILE = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/JP-audio-output/JP-joe-charlie-first-5-minutes.mp3" # Final merged MP3 output
 
 # Exit early if not run as a script
 if __name__ != "__main__":
@@ -50,7 +63,7 @@ def generate_audio_chunks(dialogue):
     from google.api_core.exceptions import GoogleAPICallError, RetryError
 
     # Initialize Google Text-to-Speech client with your service account
-    client = texttospeech.TextToSpeechClient.from_service_account_file(SERVICE_ACCOUNT_PATH)
+    client = texttospeech.TextToSpeechClient.from_service_account_file(GOOGLE_APPLICATION_CREDENTIALS)
 
     # Map each speaker label to a Japanese voice model
     SPEAKER_VOICES = {
@@ -68,7 +81,7 @@ def generate_audio_chunks(dialogue):
 
         # Sanitize the text and split into smaller chunks if too long
         sanitized = sanitize_input(text)
-        def split_text_by_bytes(text, byte_limit=4800):
+        def split_text_by_bytes(text, byte_limit=TTS_MAX_LENGTH):
             chunks = []
             current_chunk = ""
             for sentence in re.split(r'(?<=[。！？\n])', text):
@@ -112,11 +125,11 @@ def generate_audio_chunks(dialogue):
             )
             audio_config = texttospeech.AudioConfig(
                 audio_encoding=texttospeech.AudioEncoding.MP3,
-                speaking_rate=1.2  # You can adjust speed here
+                speaking_rate=TTS_SPEAKING_RATE  # You can adjust speed here
             )
 
             # Try up to MAX_RETRIES times if there's an error
-            for attempt in range(1, MAX_RETRIES + 1):
+            for attempt in range(1, TTS_MAX_RETRIES + 1):
                 try:
                     print(f"    [API] Sending request (attempt {attempt})...")
                     response = client.synthesize_speech(
@@ -133,15 +146,15 @@ def generate_audio_chunks(dialogue):
                     break  # Exit retry loop if successful
 
                 except (GoogleAPICallError, RetryError, Exception) as e:
-                    print(f"    ❌ Error on try {attempt}/{MAX_RETRIES} — {e.__class__.__name__}: {e}")
-                    if attempt == MAX_RETRIES:
+                    print(f"    ❌ Error on try {attempt}/{TTS_MAX_RETRIES} — {e.__class__.__name__}: {e}")
+                    if attempt == TTS_MAX_RETRIES:
                         # Give up after max attempts
                         failed_chunks.append(f"{i:02d}_{speaker}_{j + 1}")
                     else:
                         # Wait before retrying
-                        time.sleep(3)
-
-            time.sleep(0.5)  # Delay between calls to avoid hitting API rate limits
+                        time.sleep(TTS_RETRY_BASE_DELAY ** attempt)
+            # TTS_REQUESTS_PER_MINUTE
+            time.sleep(TTS_DELAY)  # Delay between calls to avoid hitting API rate limits
 
     # Log any failed chunks to a file so you can retry them later
     if failed_chunks:

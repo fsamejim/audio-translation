@@ -1,5 +1,5 @@
 .venv/
 .DS_Store
 joe-charlie-aa-js/test-output/
-preprocess_audio/
 .env
+**/google-credentials.json
