@@ -39,6 +39,16 @@ def main():
     
     rate_limit_delay = float(os.getenv("TRANSCRIPTION_RATE_LIMIT_DELAY", "1"))
 
+    '''
+    Where the actual speaker determination happens:
+    AssemblyAi uses Speaker A, B, C... lable
+    AssemblyAI can detect speaker changes.
+    It uses speaker diarization (clustering of voice characteristics) to detect when the speaker changes.
+    Each change in vocal pattern (pitch, tone, cadence, etc.) is analyzed and clustered as a distinct speaker.
+    In a 2-person conversation, the AssemblyAI is typically very accurate to distinguish the difference.
+    It does not carry memory across files. Each audio is processed in isolation.
+    Does not track speaker identity across files.
+    '''
     config = aai.TranscriptionConfig(
         speech_model=speech_model,
         speaker_labels=True

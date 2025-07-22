@@ -103,7 +103,7 @@ Clean unnecessary characters from the translated Japanese text including === TRA
 - input_path = "{appropriate path}/transcript_ja_xx.txt"  
 - output_path = "{appropriate path}/transcript_ja_xx_clean.txt"
 
-## Step3: Generate the mp3 audio file with Japanese
+## Step3: Generate the mp3 audio file with Japanese Text : Text-To-Speech
 Use Google api for the audio creation 
 generate-audio/multi_speaker_tts.py 
 Accomodate with safe limits, retry, error handling
