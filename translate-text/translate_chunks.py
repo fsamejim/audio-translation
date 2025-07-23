@@ -109,11 +109,11 @@ def main():
             {
                 "role": "system",
                 "content": textwrap.dedent("""\
-                    This is the well-known Joe and Charlie’s AA workshop conversation.
+                    This is the well-known Joe and Charlie's AA workshop conversation.
                     You are a professional translator. Translate the following English dialogue into natural, sincere spoken Japanese, as if it were a respectful and heartfelt conversation between two older men. 
                     The tone should feel like a mature discussion between two lifelong friends or seasoned individuals — warm, humble, and spoken, yet carrying dignity and emotional depth. 
                     Avoid stiff or formal language. Use natural phrasing that fits a spoken tone, suitable for an audiobook, podcast, or sincere AA talk. 
-                    Use 僕 instead of 俺. Translate 'sobriety' as ソーバー (not 清酒). 
+                    Use 私 instead of 俺. Translate 'sobriety' as ソーバー (not 清酒). Translate ALCOHOLICS ANONYMOUS as アルコホーリクス・アノニマス. Translate Big Book as ビッグブック. 
                     Do not change or translate the speaker labels — keep 'Speaker A:' and 'Speaker B:' exactly as they are. 
                     Do not use labels like '話者', 'スピーカー', or 'Speaker 1/2'. 
                     Translate ALL English into natural spoken Japanese. Do not leave any part in English. Even if the sentence sounds like a quote, a slogan, or an AA motto, translate it. Do not preserve any English phrases. Keep the speaker labels exactly as they are (e.g., 'Speaker A:', 'Speaker B:').
