@@ -49,9 +49,10 @@ def main():
     It does not carry memory across files. Each audio is processed in isolation.
     Does not track speaker identity across files.
     '''
+    use_diarization = os.getenv("USE_SPEAKER_DIARIZATION", "true").lower() == "true"
     config = aai.TranscriptionConfig(
         speech_model=speech_model,
-        speaker_labels=True
+        speaker_labels=use_diarization
     )
 
     transcriber = aai.Transcriber(config=config)
