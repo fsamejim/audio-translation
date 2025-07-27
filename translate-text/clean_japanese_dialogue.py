@@ -1,9 +1,11 @@
 import re
 import os
+from pathlib import Path
 
-# Input and output file paths
-input_path = "transcript_ja_09.txt"  
-output_path = "transcript_ja_09_done.txt"
+# === CONFIGURATION ===
+SCRIPT_DIR = Path(__file__).resolve().parent
+input_path = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/JP-text-translation/JP-joe-charlie-first-5-minutes.txt"
+output_path = SCRIPT_DIR.parent / "joe-charlie-aa-js/test-output/JP-text-translation/clean-JP-joe-charlie-first-5-minutes.txt"
 
 def clean_japanese_dialogue(input_path, output_path):
     if not os.path.exists(input_path):
@@ -54,3 +56,10 @@ def clean_japanese_dialogue(input_path, output_path):
 
 # Run the function
 clean_japanese_dialogue(input_path, output_path)
+
+def main():
+    clean_japanese_dialogue(input_path, output_path)
+
+if __name__ == "__main__":
+    main()
+

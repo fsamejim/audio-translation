@@ -1,1 +1,5 @@
 .venv/
+.DS_Store
+joe-charlie-aa-js/test-output/
+.env
+**/google-credentials.json
